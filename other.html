@@ -20,22 +20,35 @@
   <script>
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '1005580845030742', // Your App ID
+        appId: '1005580845030742',
         cookie: true,
         xfbml: true,
         version: 'v12.0'
       });
+      console.log("Facebook SDK Initialized");
     };
 
     function loginToFacebook() {
       FB.login(function (response) {
         if (response.authResponse) {
           console.log('Logged in!');
+          getUserInfo();
           getUserPosts();
         } else {
           console.log('User cancelled login or did not authorize.');
         }
       }, { scope: 'public_profile,user_posts' });
+    }
+
+    function getUserInfo() {
+      FB.api('/me?fields=id,name', function(response) {
+        if (response && !response.error) {
+          alert(`User Name: ${response.name}\nUser ID: ${response.id}`);
+          console.log("User Info:", response);
+        } else {
+          console.error('Error fetching user info:', response.error);
+        }
+      });
     }
 
     function getUserPosts() {
