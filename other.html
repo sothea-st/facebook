@@ -6,11 +6,10 @@
   <title>Facebook Posts Example</title>
 </head>
 <body>
-     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+  <script async defer crossorigin="anonymous" 
+    src="https://connect.facebook.net/en_US/sdk.js"></script>
 
   <h1>Facebook Posts Example</h1>
-
-  <!-- Button to trigger Facebook Login -->
   <button onclick="loginToFacebook()">Login with Facebook</button>
 
   <div id="posts-container">
@@ -19,55 +18,47 @@
   </div>
 
   <script>
-    // Initialize the Facebook SDK
-    window.fbAsyncInit = function() {
+    window.fbAsyncInit = function () {
       FB.init({
-        appId: '1005580845030742',  // Replace with your Facebook App ID
+        appId: '1005580845030742', // Your App ID
         cookie: true,
         xfbml: true,
         version: 'v12.0'
       });
     };
 
-    // Login function to authenticate user
     function loginToFacebook() {
-      FB.login(function(response) {
+      FB.login(function (response) {
         if (response.authResponse) {
           console.log('Logged in!');
-          const token = response.authResponse.accessToken; // Get the access token
-          getUserPosts(token);  // Fetch posts
+          getUserPosts();
         } else {
           console.log('User cancelled login or did not authorize.');
         }
-      }, { scope: 'public_profile,user_posts' });  // Request necessary permissions
+      }, { scope: 'public_profile,user_posts' });
     }
 
-    // Function to fetch posts of a user by their user ID
-    function getUserPosts(token) {
-      const userId = '100043035095798';  // Replace with the user ID you want to get posts from
-
-      FB.api(`/${userId}/posts?access_token=${token}`, function(response) {
+    function getUserPosts() {
+      FB.api('/me/posts', function (response) {
         if (response && !response.error) {
           console.log('User Posts:', response.data);
           displayPosts(response.data);
         } else {
           console.error('Error fetching posts:', response.error);
+          alert('Unable to fetch posts. Make sure you granted "user_posts" permission.');
         }
       });
     }
 
-    // Function to display posts on the page
     function displayPosts(posts) {
       const postsList = document.getElementById('posts-list');
-      postsList.innerHTML = ''; // Clear previous posts
-
+      postsList.innerHTML = '';
       posts.forEach(post => {
         const li = document.createElement('li');
-        li.textContent = post.message ? post.message : 'No message content'; // Display post message
+        li.textContent = post.message ? post.message : 'No message content';
         postsList.appendChild(li);
       });
     }
   </script>
-  
 </body>
 </html>
