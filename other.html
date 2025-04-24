@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Posts Example</title>
+</head>
+<body>
+     <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+  <h1>Facebook Posts Example</h1>
+
+  <!-- Button to trigger Facebook Login -->
+  <button onclick="loginToFacebook()">Login with Facebook</button>
+
+  <div id="posts-container">
+    <h2>Posts:</h2>
+    <ul id="posts-list"></ul>
+  </div>
+
+  <script>
+    // Initialize the Facebook SDK
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: '1005580845030742',  // Replace with your Facebook App ID
+        cookie: true,
+        xfbml: true,
+        version: 'v12.0'
+      });
+    };
+
+    // Login function to authenticate user
+    function loginToFacebook() {
+      FB.login(function(response) {
+        if (response.authResponse) {
+          console.log('Logged in!');
+          const token = response.authResponse.accessToken; // Get the access token
+          getUserPosts(token);  // Fetch posts
+        } else {
+          console.log('User cancelled login or did not authorize.');
+        }
+      }, { scope: 'public_profile,user_posts' });  // Request necessary permissions
+    }
+
+    // Function to fetch posts of a user by their user ID
+    function getUserPosts(token) {
+      const userId = '100043035095798';  // Replace with the user ID you want to get posts from
+
+      FB.api(`/${userId}/posts?access_token=${token}`, function(response) {
+        if (response && !response.error) {
+          console.log('User Posts:', response.data);
+          displayPosts(response.data);
+        } else {
+          console.error('Error fetching posts:', response.error);
+        }
+      });
+    }
+
+    // Function to display posts on the page
+    function displayPosts(posts) {
+      const postsList = document.getElementById('posts-list');
+      postsList.innerHTML = ''; // Clear previous posts
+
+      posts.forEach(post => {
+        const li = document.createElement('li');
+        li.textContent = post.message ? post.message : 'No message content'; // Display post message
+        postsList.appendChild(li);
+      });
+    }
+  </script>
+  
+</body>
+</html>
