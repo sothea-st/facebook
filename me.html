@@ -1,0 +1,53 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Facebook Login App</title>
+</head>
+<body>
+  <h2>Login with Facebook</h2>
+  <div id="fb-root"></div>
+  <button onclick="login()">Login with Facebook</button>
+  <pre id="output"></pre>
+
+  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+  
+  <script>
+    // Init Facebook SDK
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: '1005580845030742', 
+        cookie: true,
+        xfbml: true,
+        version: 'v19.0',
+      });
+    };
+
+    // Login function
+    function login() {
+      FB.login(function(response) {
+        if (response.authResponse) {
+          const token = response.authResponse.accessToken;
+          console.log("Access Token:", token);
+          getUserPosts(token);
+        } else {
+          document.getElementById("output").textContent = 'User cancelled login or did not fully authorize.';
+        }
+      }, { scope: 'public_profile,user_posts' });
+    }
+
+    // Fetch user posts
+    function getUserPosts(token) {
+      fetch(`https://graph.facebook.com/me/posts?access_token=${token}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+        });
+    }
+  </script>
+</body>
+</html>
+

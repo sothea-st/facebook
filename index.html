@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Facebook Login App</title>
+</head>
+
+<body>
+	<h2>Login with Facebook</h2>
+	<div id="fb-root"></div>
+	<button onclick="login()">Login with Facebook</button>
+	<pre id="output"></pre>
+
+	<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+	<script>
+		// Initialize Facebook SDK
+		window.fbAsyncInit = function () {
+			FB.init({
+				appId: '1005580845030742', // 👈 Replace with your app ID
+				cookie: true,
+				xfbml: true,
+				version: 'v19.0',  // API version
+			});
+		};
+
+		// Login function
+		function login() {
+			FB.login(function (response) {
+				if (response.authResponse) {
+					const token = response.authResponse.accessToken;
+					console.log("Access Token:", token);
+					// Call function to get posts of another user
+					getUserPosts(token);
+				} else {
+					document.getElementById("output").textContent = 'User cancelled login or did not fully authorize.';
+				}
+			}, { scope: 'public_profile,user_posts' });  // Request permission to access posts
+		}
+
+		// Fetch posts of another user by their user ID
+		function getUserPosts(token) {
+			// Get the user_id of the other user (replace `user_id` with actual user ID)
+			const user_id = '100005792895433';  // 👈 Replace with the ID of the user whose posts you want to access
+			fetch(`https://graph.facebook.com/v19.0/${user_id}/posts?access_token=${token}`)
+				.then(res => res.json())
+				.then(data => {
+					if (data && data.data) {
+						document.getElementById("output").textContent = JSON.stringify(data.data, null, 2);  // Display the user's posts
+					} else {
+						document.getElementById("output").textContent = "No posts found or permission denied.";
+					}
+				})
+				.catch(error => {
+					console.error("Error fetching posts:", error);
+					document.getElementById("output").textContent = "Error fetching posts.";
+				});
+		}
+	</script>
+</body>
+
+</html>
