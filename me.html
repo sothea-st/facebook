@@ -15,29 +15,39 @@
 
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
   
- <script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId: '1005580845030742',
-      cookie: true,
-      xfbml: true,
-      version: 'v19.0',
-    });
-  };
+  <script>
+    // Init Facebook SDK
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: '1005580845030742', 
+        cookie: true,
+        xfbml: true,
+        version: 'v19.0',
+      });
+    };
 
-  function login() {
-    FB.login(function(response) {
-      if (response.authResponse) {
-        FB.api('/me/posts', function(apiResponse) {
-          document.getElementById("output").textContent = JSON.stringify(apiResponse, null, 2);
+    // Login function
+    function login() {
+      FB.login(function(response) {
+        if (response.authResponse) {
+          const token = response.authResponse.accessToken;
+          console.log("Access Token:", token);
+          getUserPosts(token);
+        } else {
+          document.getElementById("output").textContent = 'User cancelled login or did not fully authorize.';
+        }
+      }, { scope: 'public_profile,user_posts' });
+    }
+
+    // Fetch user posts
+    function getUserPosts(token) {
+      fetch(`https://graph.facebook.com/me/posts?access_token=${token}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("output").textContent = JSON.stringify(data, null, 2);
         });
-      } else {
-        document.getElementById("output").textContent = 'Login cancelled.';
-      }
-    }, { scope: 'public_profile,user_posts' });
-  }
-</script>
-
+    }
+  </script>
 </body>
 </html>
 
